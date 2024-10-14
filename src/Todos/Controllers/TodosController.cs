@@ -1,75 +1,75 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Mime;
-using System.Text;
+using Todos.Dto;
+using Todos.Services;
 
-namespace Todos.Controllers;
-
-[ApiController]
-[Route("/api/[controller]")]
-public class TodosController : ControllerBase
+namespace Todos.Controllers
 {
-    [HttpGet]
-    public IActionResult GetList()
+    [ApiController]
+    [Route("tasks")]
+
+    /// <summary>
+    /// Controller for handling task operations
+    /// </summary>
+
+    public class TasksController : ControllerBase
     {
-        var sb = new StringBuilder();
-
-        sb.AppendLine("[");
-
-        var lines = System.IO.File.ReadAllLines("Todos.txt");
-
-        for (var i = 0; i < lines.Length; i++)
+        // Creating a new task service object to use in the controller
+        private readonly TaskService _taskService;
+        /// <summary>
+        /// Constructor for the TasksController
+        /// </summary>
+        /// <param name="taskService">Object that its parameters contains the data store and retrieve logic</param>
+        public TasksController(TaskService taskService)
         {
-            var data = lines[i].Split(",");
-
-            sb.Append($"{{ \"i\": { data[0] }, \"text\": \"{ ToTitleCase(data[1]) }\", \"isDone\": { data[2] } }}");
-            
-            if (i < lines.Length - 1)
-            {
-                sb.AppendLine(",");
-            }
-            else
-            {
-                sb.AppendLine();
-            }
+            this._taskService = taskService;
         }
 
-        sb.AppendLine("]");
-
-        return Content(sb.ToString(), MediaTypeNames.Application.Json, Encoding.UTF8);
-    }
-
-    public static string ToTitleCase(string todo)
-    {
-        var fs = todo.IndexOf(' ', 1);
-
-        if (todo[0] == ' ')
+        /// <summary>
+        /// Get all tasks
+        /// </summary>
+        /// <returns>
+        /// Ok HTTP response following the next DTO structure:
+        /// {
+        ///    "success": boolean, <- Indicates if the operation was successful
+        ///    "error": boolean, <- Indicates if an error occurred
+        ///    "action": string, <- Indicates if the operation should CONTINUE or STOP
+        ///    "statusCode": number, <- HTTP status code
+        ///    "message": string, <- Message to be displayed
+        ///    "data": list <- List of tasks || empty object 
+        /// }
+        /// </returns>
+        [HttpGet]
+        public async Task<IActionResult> GetTasks()
         {
-            if (todo.Length > 1)
-            {
-                if (fs != -1)
-                {
-                    return todo[0].ToString() + Char.ToUpper(todo[1]) + todo.Substring(2, fs - 2) + ToTitleCase(todo.Substring(fs));
-                }
-                else
-                {
-                    return todo[0].ToString() + Char.ToUpper(todo[1]) + todo.Substring(2);
-                }
-            }
-            else
-            {
-                return todo.ToUpper();
-            }
+            return Ok(await this._taskService.GetTasks());
         }
-        else
+
+        /// <summary>
+        /// Get a task by its id
+        /// </summary>
+        /// <param name="id">ID of the task</param>
+        /// <returns>
+        /// Ok HTTP response following the next DTO structure:
+        /// {
+        ///    "success": boolean, <- Indicates if the operation was successful
+        ///    "error": boolean, <- Indicates if an error occurred
+        ///    "action": string, <- Indicates if the operation should CONTINUE or STOP
+        ///    "statusCode": number, <- HTTP status code
+        ///    "message": string, <- Message to be displayed
+        ///    "data": list <- Task || empty object
+        /// }
+        /// </returns>
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetTaskById(int id)
         {
-            if (fs == -1)
+            ResponseDto result = await this._taskService.GetTaskById(id);
+
+            if (result.action == "STOP")
             {
-                return Char.ToUpper(todo[0]) + todo.Substring(1);
+                return NotFound(result);
             }
-            else
-            {
-                return Char.ToUpper(todo[0]) + todo.Substring(1, fs - 1) + ToTitleCase(todo.Substring(fs));
-            }
+
+            return Ok(result);
         }
     }
 }
