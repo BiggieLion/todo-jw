@@ -17,7 +17,7 @@ namespace Todos.Services
             TaskModel taskToSave = new TaskModel();
             taskToSave.Id = taskDto.Id;
             taskToSave.Title = TitleCase.ToTitleCase(taskDto.Title);
-            taskToSave.IsCompleted = taskDto.IsCompleted;
+            taskToSave.IsDone = taskDto.IsDone;
             taskToSave.DueDate = taskDto.DueDate;
             taskToSave.Notes = taskDto.Notes;
 
@@ -94,7 +94,7 @@ namespace Todos.Services
             }
 
             taskToUpdate.Title = TitleCase.ToTitleCase(taskDto.Title);
-            taskToUpdate.IsCompleted = taskDto.IsCompleted;
+            taskToUpdate.IsDone = taskDto.IsDone;
             taskToUpdate.DueDate = taskDto.DueDate;
             taskToUpdate.Notes = taskDto.Notes;
 
