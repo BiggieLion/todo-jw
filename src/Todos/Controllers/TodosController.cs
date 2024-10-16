@@ -25,6 +25,33 @@ namespace Todos.Controllers
         }
 
         /// <summary>
+        /// Get a task by its id
+        /// </summary>
+        /// <param name="Id">ID of the task</param>
+        /// <param name="Title">Title of the task</param>
+        /// <param name="IsDone">Flag to indicate if the task is done or not</param>
+        /// <param name="DueDate">Deadline of the task</param>
+        /// <param name="Notes">Notes of the task</param>
+        /// <returns>
+        /// Ok HTTP response following the next DTO structure:
+        /// {
+        ///    "success": boolean, <- Indicates if the operation was successful
+        ///    "error": boolean, <- Indicates if an error occurred
+        ///    "action": string, <- Indicates if the operation should CONTINUE or STOP
+        ///    "statusCode": number, <- HTTP status code
+        ///    "message": string, <- Message to be displayed
+        ///    "data": list <- Task || empty object
+        /// }
+        /// </returns>
+        [HttpPost]
+        public async Task<IActionResult> CreateTask([FromBody] TaskDto task)
+        {
+            ResponseDto result = this._taskService.CreateTask(task);
+
+            return CreatedAtAction("CreateTask", result);
+        }
+
+        /// <summary>
         /// Get all tasks
         /// </summary>
         /// <returns>
@@ -63,6 +90,34 @@ namespace Todos.Controllers
         public async Task<IActionResult> GetTaskById(int id)
         {
             ResponseDto result = await this._taskService.GetTaskById(id);
+
+            if (result.action == "STOP")
+            {
+                return NotFound(result);
+            }
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Delete a task by  id
+        /// </summary>
+        /// <param name="id">ID of the task</param>
+        /// <returns>
+        /// Ok HTTP response following the next DTO structure:
+        /// {
+        ///    "success": boolean, <- Indicates if the operation was successful
+        ///    "error": boolean, <- Indicates if an error occurred
+        ///    "action": string, <- Indicates if the operation should CONTINUE or STOP
+        ///    "statusCode": number, <- HTTP status code
+        ///    "message": string, <- Message to be displayed
+        ///    "data": list <- Task || empty object
+        /// }
+        /// </returns>
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTask(int id)
+        {
+            ResponseDto result = await this._taskService.RemoveTask(id);
 
             if (result.action == "STOP")
             {

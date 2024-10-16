@@ -12,7 +12,7 @@ namespace Todos.Services
         private readonly TodoDatabase _db;
         public TaskService(TodoDatabase todoDatabase) => _db = todoDatabase;
 
-        public ResponseDto CreateTask([FromBody] TaskDto taskDto)
+        public ResponseDto CreateTask(TaskDto taskDto)
         {
             TaskModel taskToSave = new TaskModel();
             taskToSave.Id = taskDto.Id;
@@ -30,7 +30,7 @@ namespace Todos.Services
                 error = false,
                 action = "CONTINUE",
                 statusCode = 201,
-                message = "Task created successfully",
+                message = "Tarea creada correctamente",
                 data = taskToSave
             };
         }
@@ -60,7 +60,7 @@ namespace Todos.Services
                     error = true,
                     action = "STOP",
                     statusCode = 404,
-                    message = "Task not found",
+                    message = "Tarea no encontrada",
                     data = new { }
                 };
             }
@@ -88,7 +88,7 @@ namespace Todos.Services
                     error = true,
                     action = "STOP",
                     statusCode = 404,
-                    message = "Task not found",
+                    message = "Tarea no encontrada",
                     data = new { }
                 };
             }
@@ -107,7 +107,7 @@ namespace Todos.Services
                 error = false,
                 action = "CONTINUE",
                 statusCode = 200,
-                message = "Task updated successfully",
+                message = "Tarea actualizada correctamente",
                 data = taskToUpdate
             };
         }
@@ -124,7 +124,7 @@ namespace Todos.Services
                     error = true,
                     action = "STOP",
                     statusCode = 404,
-                    message = "Task not found",
+                    message = "Tarea no encontrada",
                     data = new { }
                 };
             }
@@ -138,7 +138,7 @@ namespace Todos.Services
                 error = false,
                 action = "CONTINUE",
                 statusCode = 200,
-                message = "Task deleted successfully",
+                message = "Tarea eliminada correctamente",
                 data = taskToDelete
             };
         }

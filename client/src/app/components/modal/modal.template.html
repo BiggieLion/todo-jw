@@ -1,0 +1,40 @@
+<div mat-dialog-title>
+  <h1>{{getTitle()}}</h1>
+</div>
+
+<form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+  <div mat-dialog-content class="content">
+    <div class="row">
+      <mat-form-field appearance="outline">
+        <mat-label>Titulo</mat-label>
+        <input matInput type="text" formControlName="Titulo" >
+      </mat-form-field>
+    </div>
+    <div class="row">
+      <mat-form-field appearance="outline">
+        <mat-label>Notas</mat-label>
+        <input matInput type="text" formControlName="Notas" >
+      </mat-form-field>
+    </div>
+    <div class="row">
+      <mat-form-field appearance="outline">
+        <mat-label>Vencimiento</mat-label>
+        <input matInput readonly [matDatepicker]="picker" [min]="minDate" [max]="maxDate" formControlName="Vencimiento" />
+        <mat-hint>DD/MM/AAAA</mat-hint>
+        <mat-datepicker-toggle matSuffix style="float: right;" [for]="picker" />
+        <mat-datepicker startView="multi-year" #picker />
+      </mat-form-field>
+    </div>
+    <div class="row">
+      <div class="mat-form-field" >
+        <mat-label>Completado</mat-label>
+        <input hidden="true" matInput />
+        <mat-checkbox formControlName="Estatus" />
+      </div>
+    </div>
+  </div>
+  <div mat-dialog-actions class="action">
+    <button mat-raised-button [mat-dialog-close]="false" type="button">Cancelar</button>
+    <button [disabled]="!taskForm.valid" mat-raised-button color="primary" type="submit">{{getButton()}}</button>
+  </div>
+</form>

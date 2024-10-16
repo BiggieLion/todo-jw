@@ -6,6 +6,7 @@ import { provideRouter, Routes } from '@angular/router';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideHttpClient } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 
 const routes: Routes = [
   { path: '', redirectTo: '/tasks', pathMatch: 'full' },
@@ -18,5 +19,11 @@ if (environment.production) {
 }
 
 bootstrapApplication(AppComponent, {
-  providers: [provideHttpClient(), provideRouter(routes), provideAnimationsAsync()],
+  providers: [
+    provideHttpClient(),
+    provideRouter(routes),
+    provideAnimationsAsync(),
+    { provide: MAT_DATE_LOCALE, useValue: 'es-MX' },
+    provideNativeDateAdapter(),
+  ],
 }).catch((err) => console.error(err));

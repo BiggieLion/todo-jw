@@ -1,0 +1,33 @@
+<section class="mt-1">
+  <app-filter [label]="'Buscar'" [placeholder]="'Ej. Crear tarea...'" [(filter)]="valueToFilter" />
+
+  <div class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource">
+
+      @for (column of displayedColumns(); track $index) {
+        <ng-container [matColumnDef]="column">
+          <th mat-header-cell *matHeaderCellDef> {{column}} </th>
+          <td mat-cell *matCellDef="let element">
+            @if (column !== 'Vencimiento') {
+              {{element[column]}}
+            } @else {
+              {{element[column] | date: 'dd/MM/yyyy'}}
+            }
+            @if (column === 'Acciones') {
+              <button mat-icon-button color="primary" (click)="editTask(element)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="deleteTask(element.ID)">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <mat-checkbox (change)="onChecked($event.checked)"/>
+            }
+          </td>
+        </ng-container>
+      }
+      <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns();"></tr>
+    </table>
+    <mat-paginator [pageSizeOptions]="[5,10,20]" showFirstLastButtons aria-label="Select page of periodic table"></mat-paginator>
+  </div>
+</section>

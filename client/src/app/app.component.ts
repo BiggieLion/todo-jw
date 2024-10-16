@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { ToolbarComponent } from '@components/toolbar/toolbar.component';
 import { MatCardModule } from '@angular/material/card';
+import { ModalService } from '@components/modal/modal.service';
+import { ModalComponent } from '@components/modal/modal.component';
 
-const MODULES = [NavMenuComponent, RouterOutlet, ToolbarComponent, MatCardModule];
+const MODULES = [RouterOutlet, ToolbarComponent, MatCardModule];
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -13,15 +14,18 @@ const MODULES = [NavMenuComponent, RouterOutlet, ToolbarComponent, MatCardModule
     <section>
       <mat-card>
         <mat-card-content>
-          <app-toolbar (onNewTask)="onClickNewTask()" />
-          <router-outlet />
+          @defer {
+            <app-toolbar (onNewTask)="onClickNewTask()" />
+            <router-outlet />
+          }
         </mat-card-content>
       </mat-card>
     </section>
   `,
 })
 export class AppComponent {
+  constructor(private readonly modalSvc: ModalService) {}
   onClickNewTask(): void {
-    console.log('New task clicked');
+    this.modalSvc.openModal<ModalComponent>(ModalComponent);
   }
 }
