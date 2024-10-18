@@ -1,6 +1,6 @@
 export type ColumnKeys<T> = Array<keyof T>;
 
-export interface ITask {
+export interface TaskFront {
   ID: number | undefined;
   Titulo: string;
   Notas: string;

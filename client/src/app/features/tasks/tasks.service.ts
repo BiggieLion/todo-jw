@@ -1,8 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environment';
-import { ITask, ITaskDTO, ITaskResponse } from '@shared/models';
-import { map, Observable, tap } from 'rxjs';
+import {
+  TaskFront,
+  ITaskDTO,
+  ITaskResponse,
+} from '@features/tasks/tasks.interfaces';
+import { catchError, map, Observable, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -12,11 +16,10 @@ export class TaskService {
 
   constructor(private readonly httpClient: HttpClient) {}
 
-  createTask(task: ITask): void {
+  createTask(task: TaskFront): void {
     this.getId()
       .pipe(
         tap((id) => {
-          console.log(task);
           let taskToCreate: ITaskDTO = {
             Id: id,
             Title: task.Titulo,
@@ -25,18 +28,23 @@ export class TaskService {
             Notes: task.Notas,
           };
 
-          console.log('->', taskToCreate);
-
-          this.httpClient.post(`${this.url}tasks`, taskToCreate).subscribe();
+          this.httpClient.post(`${this.url}tasks`, taskToCreate).subscribe(
+            (res) => {
+              console.log('Task created', res);
+            },
+            (error) => {
+              console.error('Error creating task', error);
+            }
+          );
         })
       )
       .subscribe();
   }
 
-  getTasks(): Observable<ITask[]> {
+  getTasks(): Observable<TaskFront[]> {
     return this.httpClient.get(`${this.url}tasks`).pipe(
       map((res: any) => {
-        let resArray: ITask[] = [];
+        let resArray: TaskFront[] = [];
         res?.data.forEach((item: ITaskResponse) => {
           resArray.push({
             ID: item?.id,
@@ -47,22 +55,27 @@ export class TaskService {
           });
         });
 
-        console.log('resArray', resArray);
         return resArray;
       })
     );
   }
 
   updateTask(taskId: number, task: any) {
-    console.log('<----- task from update>', taskId, task);
+    const taskToUpdate: ITaskDTO = {
+      Id: taskId,
+      Title: task.Titulo,
+      IsDone: task.Estatus === 'Completado' ? true : false,
+      DueDate: new Date(task.Vencimiento).toString(),
+      Notes: task.Notas,
+    };
+
+    return this.httpClient.patch(`${this.url}tasks/${taskId}`, taskToUpdate);
   }
 
   deleteTask(taskId: number) {
-    return this.httpClient.delete(`${this.url}tasks/${taskId}`).pipe(
-      map((res: any) => {
-        console.log('res', res);
-      })
-    );
+    return this.httpClient
+      .delete(`${this.url}tasks/${taskId}`)
+      .pipe(map((res: any) => {}));
   }
 
   private getId() {
@@ -73,7 +86,9 @@ export class TaskService {
         } else if (res?.data?.length === 1) {
           return res?.data[0]?.id + 1;
         } else {
-          const idArrays: any = res?.data?.sort((a: any, b: any) => parseInt(b?.id) - parseInt(a?.id));
+          const idArrays: any = res?.data?.sort(
+            (a: any, b: any) => parseInt(b?.id) - parseInt(a?.id)
+          );
           return idArrays[0]?.id + 1;
         }
       })

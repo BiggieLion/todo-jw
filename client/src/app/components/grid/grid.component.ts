@@ -1,39 +1,55 @@
-import { ChangeDetectionStrategy, Component, effect, input, OnInit, signal, viewChild } from '@angular/core';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatPaginator } from '@angular/material/paginator';
+import {
+  Component,
+  effect,
+  inject,
+  input,
+  OnInit,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatInput } from '@angular/material/input';
 import { FilterComponent } from './filter/filter.component';
-import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { TaskService } from '@core/services/task.service';
-import { map } from 'rxjs';
-import { DatePipe } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { ModalService } from '@components/modal/modal.service';
 import { ModalComponent } from '@components/modal/modal.component';
+import { TaskService } from '@features/tasks/tasks.service';
+import { JsonPipe } from '@angular/common';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
-const MODULES = [MatCheckboxModule, MatIcon, MatButtonModule, MatTableModule, MatPaginator, FilterComponent, DatePipe];
+const MATERIAL_IMPORTS = [
+  MatTableModule,
+  MatSortModule,
+  MatPaginatorModule,
+  MatButtonModule,
+  MatIconModule,
+];
 
 @Component({
   selector: 'app-grid',
   standalone: true,
-  imports: MODULES,
-  templateUrl: './grid.template.html',
-  styleUrls: ['./grid.styles.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [FilterComponent, MATERIAL_IMPORTS, JsonPipe],
+  templateUrl: './grid.component.html',
+  styleUrl: './grid.component.scss',
 })
 export class GridComponent<T> implements OnInit {
+  private readonly _sort = viewChild.required<MatSort>(MatSort);
   private readonly _paginator = viewChild.required<MatPaginator>(MatPaginator);
+  private readonly _modalSvc = inject(ModalService);
+  private readonly _taskSvc = inject(TaskService);
 
   displayedColumns = input.required<string[]>();
   data = input.required<T[]>();
+  sortableColumns = input<string[]>([]);
 
   dataSource = new MatTableDataSource<T>();
-  valueToFilter = signal<string>('');
+  valueToFilter = signal('');
 
-  constructor(
-    private readonly taskSvc: TaskService,
-    private readonly modalSvc: ModalService
-  ) {
+  constructor() {
     effect(
       () => {
         if (this.valueToFilter()) {
@@ -52,21 +68,18 @@ export class GridComponent<T> implements OnInit {
 
   ngOnInit(): void {
     this.dataSource.data = this.data();
+    this.dataSource.sort = this._sort();
     this.dataSource.paginator = this._paginator();
   }
 
-  onChecked(isChecked: boolean): void {
-    console.log('isChecked', isChecked);
-  }
-
-  editTask(data: T): void {
-    this.modalSvc.openModal<ModalComponent, T>(ModalComponent, data);
+  onEdit(data: T): void {
+    this._modalSvc.openModal<ModalComponent, T>(ModalComponent, data, true);
   }
 
   deleteTask(id: number): void {
     const confirmation = confirm('¿Estás seguro de eliminar la tarea?');
     if (confirmation) {
-      this.taskSvc.deleteTask(id).subscribe();
+      this._taskSvc.deleteTask(id).subscribe();
     }
   }
 }

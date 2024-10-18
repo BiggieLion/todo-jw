@@ -1,18 +1,28 @@
-import { ChangeDetectionStrategy, Component, input, model } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  model,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 
-const MODULES = [FormsModule, MatLabel, MatFormField, MatInput];
+const MATERIAL_IMPORTS = [MatLabel, MatFormField, MatInput];
 
 @Component({
   selector: 'app-filter',
   standalone: true,
-  imports: MODULES,
+  imports: [FormsModule, MATERIAL_IMPORTS],
   template: `
     <mat-form-field>
       <mat-label>{{ label() }}</mat-label>
-      <input matInput type="text" [(ngModel)]="filter" [placeholder]="placeholder()" />
+      <input
+        matInput
+        type="text"
+        [(ngModel)]="filter"
+        [placeholder]="placeholder()"
+      />
     </mat-form-field>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,5 +30,5 @@ const MODULES = [FormsModule, MatLabel, MatFormField, MatInput];
 export class FilterComponent {
   filter = model('');
   label = input<string>('Filter');
-  placeholder = input<string>('Ej. "Crear ..."');
+  placeholder = input<string>('Search...');
 }

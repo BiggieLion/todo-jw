@@ -12,18 +12,13 @@ const MATERIAL_MODULES = [MatToolbarModule, MatIconModule, MatButtonModule];
   template: `
     <mat-toolbar color="primary">
       <a mat-button routerLink="/">
-        <mat-icon>dataset</mat-icon>
-        <span>Todas</span>
+        <mat-icon>home</mat-icon>
+        <span>Home</span>
       </a>
 
-      <a mat-button (click)="getPendingTasks()">
+      <a mat-button routerLink="/tasks">
         <mat-icon>pending_actions</mat-icon>
-        <span>Pendientes</span>
-      </a>
-
-      <a mat-button (click)="getDoneTasks()">
-        <mat-icon>done</mat-icon>
-        <span>Completados</span>
+        <span>Tareas</span>
       </a>
 
       <span class="spacer"></span>
@@ -37,17 +32,9 @@ const MATERIAL_MODULES = [MatToolbarModule, MatIconModule, MatButtonModule];
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ToolbarComponent {
-  onNewTask = output<void>();
+  onNewTaskEvent = output<void>();
 
-  getPendingTasks() {
-    console.log('getPendingTasks');
-  }
-
-  getDoneTasks() {
-    console.log('getDoneTasks');
-  }
-
-  emitClick() {
-    this.onNewTask.emit();
+  emitClick(): void {
+    this.onNewTaskEvent.emit();
   }
 }
