@@ -1,15 +1,9 @@
 <section class="mt-1">
-  <pre>
-    {{data() | json}}
-  </pre>
-  <pre>
-    {{valueToFilter() | json}}
-  </pre>
   <app-filter [label]="'Filter .....'" [placeholder]="'Search .....'" [(filter)]="valueToFilter"/>
   <div class="mat-elevation-z8">
     <table mat-table matSort [dataSource]="dataSource">
 
-      @for (column of displayedColumns(); track $index) {
+      @for (column of displayedColumns(); let i = $index; track $index) {
         <ng-container [matColumnDef]="column">
           @if (this.sortableColumns().includes(column)) {
             <th mat-header-cell *matHeaderCellDef mat-sort-header>{{column}}</th>
@@ -17,12 +11,20 @@
             <th mat-header-cell *matHeaderCellDef>{{column}}</th>
           }
           <td mat-cell *matCellDef="let element">
-            {{element[column]}}
+            @if (column === 'Vencimiento') {
+              {{element['dueDate'] | date: 'dd/MM/yyyy'}}
+            } @else if (column === 'Estatus' && element['isDone'] === true) {
+              Terminado
+            } @else if (column === 'Estatus' && element['isDone'] === false) {
+              Pendiente
+            } @else {
+              {{element[logicColumn[i]]}}
+            }
             @if (column === 'Acciones') {
               <button mat-icon-button color="primary" (click)="onEdit(element)">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="deleteTask(element.ID)">
+              <button mat-icon-button color="warn" (click)="deleteTask(element)">
                 <mat-icon>delete</mat-icon>
               </button>
             }

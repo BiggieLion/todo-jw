@@ -7,19 +7,19 @@
     <div class="row">
       <mat-form-field appearance="outline">
         <mat-label>Titulo</mat-label>
-        <input matInput type="text" formControlName="Titulo" >
+        <input matInput type="text" formControlName="title" >
       </mat-form-field>
     </div>
     <div class="row">
       <mat-form-field appearance="outline">
         <mat-label>Notas</mat-label>
-        <input matInput type="text" formControlName="Notas" >
+        <input matInput type="text" formControlName="notes" >
       </mat-form-field>
     </div>
     <div class="row">
       <mat-form-field appearance="outline">
         <mat-label>Vencimiento</mat-label>
-        <input matInput readonly [matDatepicker]="picker" [min]="minDate" [max]="maxDate" formControlName="Vencimiento" />
+        <input matInput readonly [matDatepicker]="picker" [min]="minDate" [max]="maxDate" formControlName="dueDate" />
         <mat-hint>DD/MM/AAAA</mat-hint>
         <mat-datepicker-toggle matSuffix style="float: right;" [for]="picker" />
         <mat-datepicker startView="multi-year" #picker />
@@ -29,7 +29,7 @@
       <div class="mat-form-field" >
         <mat-label>Completado</mat-label>
         <input hidden="true" matInput />
-        <mat-checkbox formControlName="Estatus" />
+        <mat-checkbox formControlName="isDone" />
       </div>
     </div>
   </div>

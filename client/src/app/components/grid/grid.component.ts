@@ -7,19 +7,18 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatInput } from '@angular/material/input';
 import { FilterComponent } from './filter/filter.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { ModalService } from '@components/modal/modal.service';
 import { ModalComponent } from '@components/modal/modal.component';
-import { TaskService } from '@features/tasks/tasks.service';
-import { JsonPipe } from '@angular/common';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { DatePipe } from '@angular/common';
+import { SnackbarService } from '@shared/services/snackbar.service';
+import { TaskStore } from '@stores/task.store';
+import { ITask } from '@features/tasks/tasks.interfaces';
 
 const MATERIAL_IMPORTS = [
   MatTableModule,
@@ -32,7 +31,7 @@ const MATERIAL_IMPORTS = [
 @Component({
   selector: 'app-grid',
   standalone: true,
-  imports: [FilterComponent, MATERIAL_IMPORTS, JsonPipe],
+  imports: [FilterComponent, MATERIAL_IMPORTS, DatePipe],
   templateUrl: './grid.component.html',
   styleUrl: './grid.component.scss',
 })
@@ -40,14 +39,16 @@ export class GridComponent<T> implements OnInit {
   private readonly _sort = viewChild.required<MatSort>(MatSort);
   private readonly _paginator = viewChild.required<MatPaginator>(MatPaginator);
   private readonly _modalSvc = inject(ModalService);
-  private readonly _taskSvc = inject(TaskService);
+  private readonly _snackSvc = inject(SnackbarService);
+  readonly _taskStore = inject(TaskStore);
 
-  displayedColumns = input.required<string[]>();
-  data = input.required<T[]>();
+  displayedColumns = input.required<any[]>();
   sortableColumns = input<string[]>([]);
 
-  dataSource = new MatTableDataSource<T>();
+  dataSource = new MatTableDataSource<ITask>();
   valueToFilter = signal('');
+
+  logicColumn: string[] = ['id', 'title', 'notes', 'isDone', 'dueDate'];
 
   constructor() {
     effect(
@@ -58,8 +59,8 @@ export class GridComponent<T> implements OnInit {
           this.dataSource.filter = '';
         }
 
-        if (this.data()) {
-          this.dataSource.data = this.data();
+        if (this._taskStore.tasks()) {
+          this.dataSource.data = this._taskStore.tasks();
         }
       },
       { allowSignalWrites: true }
@@ -67,7 +68,7 @@ export class GridComponent<T> implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dataSource.data = this.data();
+    this.dataSource.data = this._taskStore.tasks();
     this.dataSource.sort = this._sort();
     this.dataSource.paginator = this._paginator();
   }
@@ -76,10 +77,11 @@ export class GridComponent<T> implements OnInit {
     this._modalSvc.openModal<ModalComponent, T>(ModalComponent, data, true);
   }
 
-  deleteTask(id: number): void {
+  deleteTask(toRemove: ITask): void {
     const confirmation = confirm('¿Estás seguro de eliminar la tarea?');
     if (confirmation) {
-      this._taskSvc.deleteTask(id).subscribe();
+      this._taskStore.deleteTask(toRemove);
+      this._snackSvc.showSnackBar('Tarea eliminada');
     }
   }
 }

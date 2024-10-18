@@ -30,6 +30,7 @@
       "@shared/*": ["src/app/shared/*"],
       "@components/*": ["src/app/components/*"],
       "@features/*": ["src/app/features/*"],
+      "@stores/*": ["src/app/stores/*"]
     },
   },
   "angularCompilerOptions": {

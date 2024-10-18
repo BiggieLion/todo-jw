@@ -1,9 +1,6 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { GridComponent } from '@components/grid/grid.component';
-import { ColumnKeys, TaskFront } from '../tasks.interfaces';
-import { TaskService } from '../tasks.service';
-import { tap } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TaskStore } from '@stores/task.store';
 
 @Component({
   selector: 'app-list',
@@ -13,7 +10,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     <section>
       <app-grid
         [displayedColumns]="displayColumns"
-        [data]="tasks()"
         [sortableColumns]="sortable"
       />
     </section>
@@ -21,12 +17,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styles: ``,
 })
 export class ListComponent implements OnInit {
-  private readonly _tasksSvc = inject(TaskService);
-  private readonly _destroyRef = inject(DestroyRef);
+  taskStore = inject(TaskStore);
 
-  tasks = signal<TaskFront[]>([]);
-
-  displayColumns: ColumnKeys<TaskFront> = [
+  displayColumns = [
     'ID',
     'Titulo',
     'Notas',
@@ -34,19 +27,10 @@ export class ListComponent implements OnInit {
     'Vencimiento',
     'Acciones',
   ];
-  sortable: ColumnKeys<TaskFront> = ['ID', 'Titulo', 'Estatus', 'Vencimiento'];
+
+  sortable: string[] = ['ID', 'Titulo', 'Notas', 'Estatus', 'Vencimiento'];
 
   ngOnInit(): void {
-    this.getAllTasks();
-  }
-
-  getAllTasks() {
-    this._tasksSvc
-      .getTasks()
-      .pipe(
-        takeUntilDestroyed(this._destroyRef),
-        tap((tasksR: TaskFront[]) => this.tasks.set(tasksR))
-      )
-      .subscribe();
+    this.taskStore.getTasks();
   }
 }

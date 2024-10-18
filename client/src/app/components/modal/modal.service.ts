@@ -1,7 +1,7 @@
 import { ComponentType } from '@angular/cdk/portal';
 import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ITaskResponse } from '@features/tasks/tasks.interfaces';
+import { ITask } from '@features/tasks/tasks.interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +9,7 @@ import { ITaskResponse } from '@features/tasks/tasks.interfaces';
 export class ModalService {
   private readonly _dialog = inject(MatDialog);
 
-  openModal<CT, T = ITaskResponse>(
+  openModal<CT, T = ITask>(
     componentRef: ComponentType<CT>,
     data?: T,
     isEditing: boolean = false
